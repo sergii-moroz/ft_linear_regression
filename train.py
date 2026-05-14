@@ -1,13 +1,15 @@
 import pandas as pd
 from pathlib import Path
 
+def get_data_path(filepath=None):
+	"""Get the data file path, handling OS-specific separators"""
+	if filepath is None:
+		return Path(__file__).parent / 'data' / 'ft_linear_regression_data.csv'
+	return Path(filepath)
+
 def load_data(filepath=None):
 	"""Load the dataset from CSV file"""
-	if filepath is None:
-		filepath = Path(__file__).parent / 'data' / 'ft_linear_regression_data.csv'
-	else:
-		filepath = Path(filepath)
-	print(f"filepath:", filepath)
+	filepath = get_data_path(filepath)
 
 	try:
 		data = pd.read_csv(filepath)
