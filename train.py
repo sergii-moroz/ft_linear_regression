@@ -1,5 +1,6 @@
 import pandas as pd
 from pathlib import Path
+from data_cleaner import clean_data
 
 def get_data_path(filepath=None):
 	"""Get the data file path, handling OS-specific separators"""
@@ -13,14 +14,22 @@ def load_data(filepath=None):
 
 	try:
 		data = pd.read_csv(filepath)
+
+		# Clean and validate data
+		required_columns = ['km', 'price']
+		data = clean_data(data, required_columns)
+
+		if data is None:
+			return None, None
+
 		x = data['km'].values
 		y = data['price'].values
 		return x, y
 	except FileNotFoundError:
 		print(f"Error: File '{filepath}' not found")
 		return None, None
-	except KeyError as e:
-		print(f"Error: Column {e} not found in the datase")
+	except Exception as e:
+		print(f"Error loading data: {e}")
 		return None, None
 
 def main():
