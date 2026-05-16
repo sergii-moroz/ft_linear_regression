@@ -1,6 +1,7 @@
 import pandas as pd
 from pathlib import Path
 from data_cleaner import clean_data
+from linearRegression import LinearRegression
 
 def get_data_path(filepath=None):
 	"""Get the data file path, handling OS-specific separators"""
@@ -40,11 +41,24 @@ def main():
 
 	# Load data
 	print("Loading data...")
-	x, y = load_data()
+	x, y = load_data()#"data/test.csv")
 	if x is None or y is None:
 		return
 	print("x:", x)
 	print("y", y)
+
+	# Create and train model
+	model = LinearRegression(learning_rate=0.01, iterations=20000)
+	a, b = model.fit(x, y)
+
+	print("=" * 42)
+	print("TRAINING COMPLETE")
+	print("=" * 42)
+	print(f"Final model: price = {a:.6f} * mileage + {b:.2f}")
+
+	# Plot cost history
+	print(f"Generating cost history plot")
+	model.plot_cost_history()
 
 if __name__ == "__main__":
 	main()
