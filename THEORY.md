@@ -113,3 +113,69 @@ $$a_{new} = a_{old} + \lambda \cdot \left[\frac{1}{m} \cdot \sum_{i=1}^m(a \cdot
 $$b_{new} = b_{old} + \lambda \cdot \left[\frac{1}{m} \cdot \sum_{i=1}^m(a \cdot x^i + b - y^i)\right] $$
 
 We reapeat these updates until the cost function converges.
+
+### Learning Rate $\lambda$
+
+The Learning rate controls how big each step is:
+- **Too small**: Training is very slow, takes many iterations
+- **Too large**: May overshoot the minimum, fail to converge, or diverge
+
+Typical values: $0.001$ to $0.1$
+
+## Feature Normalization
+
+When features have very different scales (like mileage: 0-240000 vs price: 3650-8290), gradient descent can be slow and unstable.
+
+### Why Normalize?
+
+- Makes gradient descent converge faster
+- Prevents numerical instability
+- Ensures all features contribute equally
+
+### Min-Max Normalization
+
+$$\overline{x} = \frac{x - x_{min}}{x_{max} - x_{min}}$$
+
+$$\overline{y} = \frac{y - y_{min}}{y_{max} - y_{min}}$$
+This scales values to the range $[0, 1]$
+
+Then you fit a line on the normalized data:
+
+$$\overline{y} = \overline{a} \cdot \overline{x} + \overline{b}$$
+
+### Denormalization
+
+After training on normalized data, we must denormalize the parameters to make predicitons on original scale data.
+
+- Let's start with normalized equestion
+
+$$\overline{y} = \overline{a} \cdot \overline{x} + \overline{b}$$
+
+- Substitute the normalization formulas
+
+$$\frac{y - y_{min}}{y_{max} - y_{min}} = \overline{a} \cdot \frac{x - x_{min}}{x_{max} - x_{min}} + \overline{b}$$
+
+- Multiply both sides by $y_{max} - y_{min}$
+
+$$y - y_{min} = \overline{a} \cdot \frac{x - x_{min}}{x_{max} - x_{min}} \cdot (y_{max} - y_{min}) + \overline{b} \cdot (y_{max} - y_{min})$$
+
+- Let's expand the term with $x$
+
+$$y - y_{min} = \overline{a} \cdot \frac{y_{max} - y_{min}}{x_{max} - x_{min}} \cdot x - \overline{a} \cdot \frac{y_{max} - y_{min}}{x_{max} - x_{min}} \cdot x_{min} + \overline{b} \cdot (y_{max} - y_{min})$$
+
+- Isolate $y$
+
+$$y = \overline{a} \cdot \frac{y_{max} - y_{min}}{x_{max} - x_{min}} \cdot x - \overline{a} \cdot \frac{y_{max} - y_{min}}{x_{max} - x_{min}} \cdot x_{min} + \overline{b} \cdot (y_{max} - y_{min}) + y_{min}$$
+
+### Original slope $a$
+
+$$a = \overline{a} \cdot \frac{y_{max} - y_{min}}{x_{max} - x_{min}}$$
+
+### Original intercept $b$
+
+$$b = y_{min} - \overline{a} \cdot \frac{y_{max} - y_{min}}{x_{max} - x_{min}} \cdot x_{min} + \overline{b} \cdot (y_{max} - y_{min})$$
+
+or more compactly:
+
+$$b = y_{min} + (y_{max} - y_{min}) \cdot \left(\overline{b} - \overline{a} \cdot \frac{x_{min}}{x_{max} - x_{min}}\right) $$
+
